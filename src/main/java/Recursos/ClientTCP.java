@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class ClientTCP {
@@ -19,7 +20,7 @@ public class ClientTCP {
     private static final int PORTA = 9000;
 
     public static void main(String[] args) {
-        String servidor = "ServidorMensagem";
+        String servidor = "Server";
         Socket socket = null;
         InetAddress enderecoServidor = null;
         Mensagem mensagem;
@@ -30,51 +31,57 @@ public class ClientTCP {
         ObjectInputStream objectInputStream = null;
 
         try {
-            enderecoServidor = InetAddress.getByName(servidor);
+            enderecoServidor = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        // iniciar
         try {
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
+            socket = new Socket(enderecoServidor, PORTA);
         } catch (IOException e) {
             e.printStackTrace();
         }
+            // iniciar
+            try {
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
 
-        // enviar mensagem
-        try {
-            System.out.print("Escreva a mensagem: ");
-            mensagem = new Mensagem(ler.next());
-            objectOutputStream.writeObject(mensagem);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                objectInputStream = new ObjectInputStream(socket.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        // aguardar resposta
-        try {
-            resposta = (Mensagem) objectInputStream.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+            // enviar mensagem
+            try {
+                System.out.print("Escreva a mensagem: ");
+                mensagem = new Mensagem(ler.next());
+                mensagem.setEnderecoIP(enderecoServidor.getHostAddress());
+                objectOutputStream.writeObject(mensagem);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            // aguardar resposta
+            try {
+                resposta = (Mensagem) objectInputStream.readObject();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
 
-        // apresentar resposta
-        if( resposta instanceof Mensagem) {
-            ArrayList<String> enderecos = MensagemService.toArray(resposta.getConteudo());
-            enderecos.forEach(element -> {
-                System.out.println("Endereço: " + element);
-            });
-        }
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // apresentar resposta
+            if (resposta instanceof Mensagem) {
+                List<String> enderecos = MensagemService.toArray(resposta.getConteudo());
+                enderecos.forEach(element -> {
+                    System.out.println("Endereço: " + element);
+                });
+            }
 
     }
 }

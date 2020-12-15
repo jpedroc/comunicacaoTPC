@@ -1,8 +1,8 @@
 package Servicos;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MensagemService {
 
@@ -10,7 +10,7 @@ public class MensagemService {
         return enderecos.toString();
     }
 
-    public static ArrayList<String> toArray(String conteudo) {
-        return (ArrayList<String>) Arrays.asList(conteudo.split(","));
+    public static List<String> toArray(String conteudo) {
+        return Arrays.asList(conteudo.split(","));
     }
 }
