@@ -14,7 +14,7 @@ public class ProcessarMensagemServidor extends Thread{
     @Override
     public void run() {
         try {
-            if(RespostaServidor.getEnderecosIP().contains(this.mensagem.getEnderecoIP())) {
+            if(!RespostaServidor.getEnderecosIP().contains(this.mensagem.getEnderecoIP())) {
                 RespostaServidor.addEnderecosIP(this.mensagem.getEnderecoIP());
             }
             RespostaServidor.addMensagem(this.mensagem.getConteudo());
